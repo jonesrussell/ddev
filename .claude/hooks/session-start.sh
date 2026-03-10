@@ -82,5 +82,17 @@ fi
 
 echo ""
 echo "💡 Always run 'make staticrequired' before committing (golangci-lint + markdownlint)"
+# Milestone governance check
+if command -v gh &>/dev/null && [ -f "$CLAUDE_PROJECT_DIR/bin/check-milestones" ]; then
+  echo ""
+  "$CLAUDE_PROJECT_DIR/bin/check-milestones" 2>/dev/null || true
+fi
+
+# Drift detection
+if [ -f "$CLAUDE_PROJECT_DIR/tools/drift-detector.sh" ]; then
+  echo ""
+  "$CLAUDE_PROJECT_DIR/tools/drift-detector.sh" 2>/dev/null || true
+fi
+
 echo ""
 echo "✨ Environment ready for DDEV development!"

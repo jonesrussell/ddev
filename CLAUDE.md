@@ -79,6 +79,36 @@ markdownlint --fix $FILE                      # Fix markdown formatting
 - `.ddev/config.yaml` - Per-project configuration
 - `~/.ddev/global_config.yaml` - Global configuration
 
+### Orchestration (Codified Context)
+
+| File pattern | Specialist skill | Cold memory spec |
+|---|---|---|
+| `pkg/ddevapp/*` | `ddev:core-app` | `docs/codified-context/ddevapp.md` |
+| `pkg/dockerutil/*` | `ddev:docker` | `docs/codified-context/dockerutil.md` |
+| `pkg/config/*`, `pkg/globalconfig/*` | `ddev:config` | `docs/codified-context/config.md` |
+| `cmd/ddev/*` | — | — |
+| `containers/*` | — | — |
+| `pkg/fileutil/*`, `pkg/netutil/*`, `pkg/util/*` | — | — |
+| `pkg/versionconstants/*` | — | — |
+
+### Layer Reference
+
+```text
+Layer 0 (Foundation): nodeps, util, fileutil, netutil, exec, archive, heredoc, output, styles
+Layer 1 (Config):     config/types, globalconfig, versionconstants
+Layer 2 (Docker):     dockerutil, docker
+Layer 3 (App):        ddevapp (imports Layer 0-2, never imported by them)
+Layer 4 (CLI):        cmd/ddev (Cobra commands, imports Layer 3)
+Rule: packages import only from their layer or lower.
+```
+
+### Common Operations
+
+- **Adding a CLI command**: create `cmd/ddev/cmd/cmd_<name>.go`, register in `cmd/ddev/cmd/root.go`, add tests in `cmd/ddev/cmd/cmd_<name>_test.go`
+- **Adding a project type**: add `<type>.go` in `pkg/ddevapp/`, register in `appTypeMatrix` in `pkg/ddevapp/apptypes.go`, add detection logic, add tests
+- **Modifying DdevApp config**: update struct in `pkg/ddevapp/ddevapp.go`, update `config.go` read/write, update `pkg/ddevapp/config_test.go`
+- **Updating container images**: edit tags in `pkg/versionconstants/versionconstants.go`, test with `make && .gotmp/bin/<platform>/ddev start`
+
 ## Development Notes
 
 ### Go Environment

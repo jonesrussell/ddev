@@ -3077,7 +3077,7 @@ There are several easy ways to use DDEV with WordPress:
 
     ```bash
     mkdir -p my-wp-bedrock-site && cd my-wp-bedrock-site
-    ddev config --project-type=bedrock
+    ddev config --project-type=wp-bedrock
     ddev start
     ddev composer create-project roots/bedrock
     ```

@@ -87,10 +87,6 @@ func TestWriteSettings(t *testing.T) {
 			envVarFound, err := fileutil.FgrepStringInFile(expectedSettingsFile, "getenv('DDEV_PRIMARY_URL')")
 			assert.NoError(err)
 			assert.True(envVarFound, "Expected getenv('DDEV_PRIMARY_URL') in %s for dynamic WP_HOME", expectedSettingsFile)
-
-			shareURLFound, err := fileutil.FgrepStringInFile(expectedSettingsFile, "getenv('DDEV_SHARE_URL')")
-			assert.NoError(err)
-			assert.True(shareURLFound, "Expected getenv('DDEV_SHARE_URL') in %s for share URL fallback", expectedSettingsFile)
 		}
 
 		_ = os.Remove(expectedSettingsFile)

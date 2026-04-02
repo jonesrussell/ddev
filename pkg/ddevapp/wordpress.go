@@ -17,8 +17,6 @@ import (
 // WordpressConfig encapsulates all the configurations for a WordPress site.
 type WordpressConfig struct {
 	WPGeneric        bool
-	DeployName       string
-	DeployURL        string
 	DatabaseName     string
 	DatabaseUsername string
 	DatabasePassword string
@@ -49,7 +47,6 @@ func NewWordpressConfig(app *DdevApp, absPath string) *WordpressConfig {
 		DatabaseUsername: "db",
 		DatabasePassword: "db",
 		DatabaseHost:     "ddev-" + app.Name + "-db",
-		DeployURL:        app.GetPrimaryURL(),
 		Docroot:          "/var/www/html/docroot",
 		TablePrefix:      "wp_",
 		AuthKey:          util.RandString(64),

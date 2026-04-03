@@ -12,6 +12,7 @@ import (
 	"github.com/ddev/ddev/pkg/exec"
 	"github.com/ddev/ddev/pkg/globalconfig"
 	"github.com/ddev/ddev/pkg/nodeps"
+	"github.com/ddev/ddev/pkg/testsetup"
 	asrt "github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -20,6 +21,12 @@ var DdevBin = "ddev"
 
 func init() {
 	globalconfig.EnsureGlobalConfig()
+}
+
+func ensureDdevBin() {
+	if DdevBin == "ddev" {
+		DdevBin = testsetup.MustResolveDdevBinary()
+	}
 }
 
 var TestSites = []TestSite{
@@ -60,10 +67,7 @@ func TestCreateTmpDir(t *testing.T) {
 // TestValidTestSite tests the TestSite struct behavior in the case of a valid configuration.
 func TestValidTestSite(t *testing.T) {
 	assert := asrt.New(t)
-
-	if os.Getenv("DDEV_BINARY_FULLPATH") != "" {
-		DdevBin = os.Getenv("DDEV_BINARY_FULLPATH")
-	}
+	ensureDdevBin()
 	origDir, _ := os.Getwd()
 
 	// It's not ideal to copy/paste this archive around, but we don't actually care about the contents
@@ -107,6 +111,7 @@ func TestGetLocalHTTPResponse(t *testing.T) {
 	if os.Getenv("DDEV_RUN_TEST_ANYWAY") != "true" && (nodeps.IsWindows() || dockerutil.IsColima() || dockerutil.IsLima() || dockerutil.IsRancherDesktop() || nodeps.IsWSL2MirroredMode()) {
 		t.Skip("Skipping on Windows/Colima/Lima/Rancher/WSL2-mirrored as it always seems to fail")
 	}
+	ensureDdevBin()
 
 	// We have to get globalconfig read so CA is known and installed.
 	err := globalconfig.ReadGlobalConfig()
@@ -117,10 +122,6 @@ func TestGetLocalHTTPResponse(t *testing.T) {
 	origDir, _ := os.Getwd()
 
 	dockerutil.EnsureDdevNetwork()
-
-	if os.Getenv("DDEV_BINARY_FULLPATH") != "" {
-		DdevBin = os.Getenv("DDEV_BINARY_FULLPATH")
-	}
 
 	// It's not ideal to copy/paste this archive around, but we don't actually care about the contents
 	// of the archive for this test, only that it exists and can be extracted. This should (knock on wood)
@@ -213,6 +214,7 @@ func TestGetCachedArchive(t *testing.T) {
 // TestPretestAndEnv tests that the testsite PretestCmd works along with WebEvironment
 func TestPretestAndEnv(t *testing.T) {
 	assert := asrt.New(t)
+	ensureDdevBin()
 
 	origDir, err := os.Getwd()
 	require.NoError(t, err)

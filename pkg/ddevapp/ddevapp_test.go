@@ -27,6 +27,7 @@ import (
 	"github.com/ddev/ddev/pkg/nodeps"
 	"github.com/ddev/ddev/pkg/output"
 	"github.com/ddev/ddev/pkg/testcommon"
+	"github.com/ddev/ddev/pkg/testsetup"
 	"github.com/ddev/ddev/pkg/util"
 	"github.com/ddev/ddev/pkg/versionconstants"
 	"github.com/google/uuid"
@@ -396,10 +397,7 @@ var (
 )
 
 func init() {
-	// Make sets DDEV_BINARY_FULLPATH when building the executable
-	if os.Getenv("DDEV_BINARY_FULLPATH") != "" {
-		DdevBin = os.Getenv("DDEV_BINARY_FULLPATH")
-	}
+	DdevBin = testsetup.MustResolveDdevBinary()
 	if os.Getenv("DDEV_TEST_NO_BIND_MOUNTS") == "true" {
 		globalconfig.DdevGlobalConfig.NoBindMounts = true
 	}

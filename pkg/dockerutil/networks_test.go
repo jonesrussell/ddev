@@ -76,6 +76,7 @@ func TestNetworkAmbiguity(t *testing.T) {
 	if dockerutil.IsPodman() {
 		t.Skip("Skipping because Podman handles networking differently")
 	}
+	ensureDdevBin()
 
 	origDir, _ := os.Getwd()
 

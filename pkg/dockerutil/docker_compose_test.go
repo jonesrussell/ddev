@@ -11,6 +11,7 @@ import (
 	"github.com/ddev/ddev/pkg/fileutil"
 	"github.com/ddev/ddev/pkg/globalconfig"
 	"github.com/ddev/ddev/pkg/testcommon"
+	"github.com/ddev/ddev/pkg/testsetup"
 	"github.com/ddev/ddev/pkg/util"
 	"github.com/ddev/ddev/pkg/versionconstants"
 	asrt "github.com/stretchr/testify/assert"
@@ -19,11 +20,13 @@ import (
 
 var DdevBin = "ddev"
 
-func init() {
-	// Make sets DDEV_BINARY_FULLPATH when building the executable
-	if os.Getenv("DDEV_BINARY_FULLPATH") != "" {
-		DdevBin = os.Getenv("DDEV_BINARY_FULLPATH")
+func ensureDdevBin() {
+	if DdevBin == "ddev" {
+		DdevBin = testsetup.MustResolveDdevBinary()
 	}
+}
+
+func init() {
 	if os.Getenv("DDEV_TEST_NO_BIND_MOUNTS") == "true" {
 		globalconfig.DdevGlobalConfig.NoBindMounts = true
 	}

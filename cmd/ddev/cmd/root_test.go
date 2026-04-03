@@ -18,6 +18,7 @@ import (
 	"github.com/ddev/ddev/pkg/nodeps"
 	"github.com/ddev/ddev/pkg/output"
 	"github.com/ddev/ddev/pkg/testcommon"
+	"github.com/ddev/ddev/pkg/testsetup"
 	"github.com/ddev/ddev/pkg/util"
 	asrt "github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -66,15 +67,7 @@ var (
 
 func TestMain(m *testing.M) {
 	testcommon.ClearDockerEnv()
-
-	if os.Getenv("DDEV_BINARY_FULLPATH") != "" {
-		DdevBin = os.Getenv("DDEV_BINARY_FULLPATH")
-	} else {
-		binPath, err := osexec.LookPath(DdevBin)
-		if err == nil {
-			DdevBin = binPath
-		}
-	}
+	DdevBin = testsetup.MustResolveDdevBinary()
 
 	bash := util.FindBashPath()
 	ver, _ := exec.RunCommand(bash, []string{"-c", fmt.Sprintf("%s --version -j | jq -r .raw.version", DdevBin)})

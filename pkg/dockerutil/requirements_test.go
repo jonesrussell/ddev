@@ -16,6 +16,7 @@ import (
 // TestCheckCompose tests detection of docker-compose.
 func TestCheckCompose(t *testing.T) {
 	assert := asrt.New(t)
+	ensureDdevBin()
 
 	globalconfig.DockerComposeVersion = ""
 	composeErr := dockerutil.CheckDockerCompose()

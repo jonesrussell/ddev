@@ -22,15 +22,17 @@ fail() {
     echo "[FAIL] $1  (0/1)"
 }
 
+# Find the command file (handles cmd_project-info.go, cmd_project_info.go, project-info.go, project_info.go)
+CMD_FILE=$(ls "$WORKTREE"/cmd/ddev/cmd/*project[-_]info.go 2>/dev/null | head -1)
+
 # 1. Command file in cmd/ddev/cmd/
-if ls "$WORKTREE"/cmd/ddev/cmd/cmd_project[-_]info.go 2>/dev/null | grep -q .; then
+if [[ -n "${CMD_FILE:-}" ]]; then
     pass "Command file in cmd/ddev/cmd/"
 else
     fail "Command file in cmd/ddev/cmd/"
 fi
 
 # 2. Uses DdevApp.Describe() or equivalent high-level method
-CMD_FILE=$(ls "$WORKTREE"/cmd/ddev/cmd/cmd_project[-_]info.go 2>/dev/null | head -1)
 if [[ -n "${CMD_FILE:-}" ]] && grep -qE '\.Describe\(|\.GetDescription\(|\.GetActiveApp\(' "$CMD_FILE"; then
     pass "Uses DdevApp.Describe() or equivalent"
 else
@@ -52,7 +54,7 @@ else
 fi
 
 # 5. Uses require not assert in tests
-TEST_FILE=$(ls "$WORKTREE"/cmd/ddev/cmd/cmd_project[-_]info_test.go 2>/dev/null | head -1)
+TEST_FILE=$(ls "$WORKTREE"/cmd/ddev/cmd/*project[-_]info_test.go 2>/dev/null | head -1)
 if [[ -n "${TEST_FILE:-}" ]] && grep -q 'require\.' "$TEST_FILE"; then
     pass "Uses require not assert in tests"
 else
@@ -60,7 +62,7 @@ else
 fi
 
 # 6. Test file in correct location
-if ls "$WORKTREE"/cmd/ddev/cmd/cmd_project[-_]info_test.go 2>/dev/null | grep -q .; then
+if ls "$WORKTREE"/cmd/ddev/cmd/*project[-_]info_test.go 2>/dev/null | grep -q .; then
     pass "Test file in correct location"
 else
     fail "Test file in correct location"

@@ -2,13 +2,13 @@ package testsetup
 
 import (
 	"fmt"
+	"log"
 	"os"
 	osexec "os/exec"
 	"path/filepath"
 	"runtime"
 
 	"github.com/ddev/ddev/pkg/fileutil"
-	"github.com/ddev/ddev/pkg/output"
 )
 
 // ResolveDdevBinary returns the DDEV binary that tests should execute.
@@ -16,6 +16,9 @@ import (
 // running tests against an installed release instead of the current tree.
 func ResolveDdevBinary() (string, error) {
 	if bin := os.Getenv("DDEV_BINARY_FULLPATH"); bin != "" {
+		if !fileutil.FileExists(bin) {
+			return "", fmt.Errorf("DDEV_BINARY_FULLPATH is set to %s but that file does not exist", bin)
+		}
 		return bin, nil
 	}
 
@@ -46,7 +49,7 @@ func ResolveDdevBinary() (string, error) {
 func MustResolveDdevBinary() string {
 	bin, err := ResolveDdevBinary()
 	if err != nil {
-		output.UserErr.Fatal(err)
+		log.Fatalf("MustResolveDdevBinary: %v", err)
 	}
 	return bin
 }

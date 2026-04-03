@@ -14,9 +14,12 @@ import (
 
 var DdevBin = "ddev"
 
+func init() {
+	DdevBin = testsetup.MustResolveDdevBinary()
+}
+
 func TestGetVersionInfo(t *testing.T) {
 	assert := asrt.New(t)
-	DdevBin = testsetup.MustResolveDdevBinary()
 
 	// Run `ddev version` so we force download of docker-compose if we don't have one.
 	_, err := exec2.RunHostCommand(DdevBin, "version")

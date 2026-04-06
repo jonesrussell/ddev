@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/ddev/ddev/pkg/ddevapp"
 	"github.com/ddev/ddev/pkg/util"
@@ -65,6 +66,10 @@ ddev add-on reapply --all --project my-project`,
 					toReapply = append(toReapply, manifest)
 				}
 			}
+			// Sort for deterministic ordering across runs.
+			sort.Slice(toReapply, func(i, j int) bool {
+				return toReapply[i].Name < toReapply[j].Name
+			})
 		} else {
 			for _, name := range args {
 				manifest, ok := manifests[name]
@@ -74,6 +79,11 @@ ddev add-on reapply --all --project my-project`,
 				toReapply = append(toReapply, manifest)
 			}
 		}
+
+		// Track add-ons with failures so we can report a summary and exit
+		// non-zero at the end without aborting the loop on the first failure.
+		// This matters for `--all`: one failing add-on must not block the rest.
+		var failedAddons []string
 
 		for _, manifest := range toReapply {
 			if len(manifest.PreInstallActions) == 0 && len(manifest.PostInstallActions) == 0 {
@@ -89,6 +99,8 @@ ddev add-on reapply --all --project my-project`,
 
 			util.Success("\nReapplying add-on %s:", manifest.Name)
 
+			addonFailed := false
+
 			if len(manifest.PreInstallActions) > 0 {
 				util.Success("Executing pre-install actions:")
 			}
@@ -97,10 +109,11 @@ ddev add-on reapply --all --project my-project`,
 				if err != nil {
 					actionDesc := ddevapp.GetAddonDdevDescription(action)
 					if !verbose {
-						util.Failed("Could not process pre-install action (%d) '%s' for add-on '%s'.\nFor more detail, use --verbose", i, actionDesc, manifest.Name)
+						util.Warning("Could not process pre-install action (%d) '%s' for add-on '%s'.\nFor more detail, use --verbose", i, actionDesc, manifest.Name)
 					} else {
-						util.Failed("Could not process pre-install action (%d) '%s' for add-on '%s': %v", i, actionDesc, manifest.Name, err)
+						util.Warning("Could not process pre-install action (%d) '%s' for add-on '%s': %v", i, actionDesc, manifest.Name, err)
 					}
+					addonFailed = true
 				}
 			}
 
@@ -112,12 +125,21 @@ ddev add-on reapply --all --project my-project`,
 				if err != nil {
 					actionDesc := ddevapp.GetAddonDdevDescription(action)
 					if !verbose {
-						util.Failed("Could not process post-install action (%d) '%s' for add-on '%s'.\nFor more detail, use --verbose", i, actionDesc, manifest.Name)
+						util.Warning("Could not process post-install action (%d) '%s' for add-on '%s'.\nFor more detail, use --verbose", i, actionDesc, manifest.Name)
 					} else {
-						util.Failed("Could not process post-install action (%d) '%s' for add-on '%s': %v", i, actionDesc, manifest.Name, err)
+						util.Warning("Could not process post-install action (%d) '%s' for add-on '%s': %v", i, actionDesc, manifest.Name, err)
 					}
+					addonFailed = true
 				}
 			}
+
+			if addonFailed {
+				failedAddons = append(failedAddons, manifest.Name)
+			}
+		}
+
+		if len(failedAddons) > 0 {
+			util.Failed("Reapply failed for add-on(s): %v", failedAddons)
 		}
 	},
 }

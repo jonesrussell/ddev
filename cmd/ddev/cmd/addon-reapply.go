@@ -43,10 +43,10 @@ ddev add-on reapply --all --project my-project`,
 			}
 		}()
 
-		err = os.Chdir(app.GetConfigPath(""))
-		if err != nil {
-			util.Failed("Unable to chdir to %v: %v", app.GetConfigPath(""), err)
-		}
+		// Note: cwd for action execution is set per-section inside the loop
+		// below. During original install, pre-install actions run from
+		// app.AppRoot and post-install actions run from app.GetConfigPath("");
+		// reapply must mirror that to keep relative paths in actions working.
 
 		_ = app.DockerEnv()
 
@@ -103,6 +103,10 @@ ddev add-on reapply --all --project my-project`,
 
 			if len(manifest.PreInstallActions) > 0 {
 				util.Success("Executing pre-install actions:")
+				// Pre-install actions run from app.AppRoot during install.
+				if err = os.Chdir(app.AppRoot); err != nil {
+					util.Failed("Unable to chdir to %v: %v", app.AppRoot, err)
+				}
 			}
 			for i, action := range manifest.PreInstallActions {
 				err = ddevapp.ProcessAddonAction(action, desc, app, verbose)
@@ -119,6 +123,10 @@ ddev add-on reapply --all --project my-project`,
 
 			if len(manifest.PostInstallActions) > 0 {
 				util.Success("Executing post-install actions:")
+				// Post-install actions run from .ddev/ during install.
+				if err = os.Chdir(app.GetConfigPath("")); err != nil {
+					util.Failed("Unable to chdir to %v: %v", app.GetConfigPath(""), err)
+				}
 			}
 			for i, action := range manifest.PostInstallActions {
 				err = ddevapp.ProcessAddonAction(action, desc, app, verbose)

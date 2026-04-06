@@ -603,6 +603,22 @@ func TestCmdAddonReapply(t *testing.T) {
 		_ = os.RemoveAll(filepath.Join(globalconfig.GetGlobalDdevDir(), "globalextras"))
 	})
 
+	// Clean up any add-ons left over from prior tests in this project (e.g.
+	// TestCmdAddonComplex installs sample_get into TestSites[0] and may not
+	// fully remove it). This ensures the --all assertion below only sees the
+	// example add-on we install.
+	metadataDir := app.GetConfigPath(ddevapp.AddonMetadataDir)
+	if entries, readErr := os.ReadDir(metadataDir); readErr == nil {
+		for _, entry := range entries {
+			if entry.IsDir() {
+				_, _ = exec.RunHostCommand(DdevBin, "add-on", "remove", entry.Name())
+				// Belt-and-suspenders: ensure the metadata dir is gone even if
+				// removal actions failed for whatever reason.
+				_ = os.RemoveAll(filepath.Join(metadataDir, entry.Name()))
+			}
+		}
+	}
+
 	exampleDir := filepath.Join(origDir, "testdata", "TestCmdAddon", "example-repo")
 
 	// Install the example add-on

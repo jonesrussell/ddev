@@ -335,7 +335,13 @@ func createManifestFile(app *ddevapp.DdevApp, addonName string, repository strin
 	if err != nil {
 		util.Failed("Error creating manifest directory: %v", err)
 	}
-	if err = fileutil.TemplateStringToFile(string(manifestData), nil, manifestFile); err != nil {
+	// Write the marshaled YAML directly. Do NOT go through TemplateStringToFile
+	// here: PreInstallActions/PostInstallActions are raw add-on scripts that
+	// contain Go template directives (e.g. {{ trimPrefix ... }}) meant to be
+	// rendered later by ProcessAddonAction with the addon's function map. Running
+	// the manifest YAML through template.Execute with nil vars would try to
+	// evaluate those directives against an empty function map and fail.
+	if err = os.WriteFile(manifestFile, manifestData, 0600); err != nil {
 		util.Failed("Error writing manifest file: %v", err)
 	}
 	return manifest, nil

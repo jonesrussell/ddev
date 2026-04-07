@@ -12,12 +12,12 @@ import (
 )
 
 // ResolveDdevBinary returns the DDEV binary that tests should execute.
-// It refuses to fall back to an arbitrary ddev on PATH to avoid accidentally
-// running tests against an installed release instead of the current tree.
+// If DDEV_BINARY_FULLPATH is set, it is used directly. Otherwise the binary
+// is built from source via `make`.
 func ResolveDdevBinary() (string, error) {
 	if bin := os.Getenv("DDEV_BINARY_FULLPATH"); bin != "" {
 		if !fileutil.FileExists(bin) {
-			return "", fmt.Errorf("DDEV_BINARY_FULLPATH is set to %s but that file does not exist", bin)
+			return "", fmt.Errorf("DDEV_BINARY_FULLPATH=%s does not exist", bin)
 		}
 		return bin, nil
 	}
@@ -31,18 +31,19 @@ func ResolveDdevBinary() (string, error) {
 	if runtime.GOOS == "windows" {
 		binaryName += ".exe"
 	}
+	binaryPath := filepath.Join(repoRoot, ".gotmp", "bin", runtime.GOOS+"_"+runtime.GOARCH, binaryName)
 
-	candidate := filepath.Join(repoRoot, ".gotmp", "bin", runtime.GOOS+"_"+runtime.GOARCH, binaryName)
-	if fileutil.FileExists(candidate) {
-		return candidate, nil
+	cmd := osexec.Command("make")
+	cmd.Dir = repoRoot
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("`make` failed: %w", err)
 	}
-
-	pathBin, lookPathErr := osexec.LookPath("ddev")
-	if lookPathErr == nil {
-		return "", fmt.Errorf("DDEV_BINARY_FULLPATH is not set and repo-local test binary %s was not found; refusing to use PATH-resolved ddev at %s. Run `make`, use `make testcmd`/`make testpkg`, or set DDEV_BINARY_FULLPATH explicitly", candidate, pathBin)
+	if !fileutil.FileExists(binaryPath) {
+		return "", fmt.Errorf("`make` succeeded but %s was not found", binaryPath)
 	}
-
-	return "", fmt.Errorf("DDEV_BINARY_FULLPATH is not set and repo-local test binary %s was not found. Run `make`, use `make testcmd`/`make testpkg`, or set DDEV_BINARY_FULLPATH explicitly", candidate)
+	return binaryPath, nil
 }
 
 // MustResolveDdevBinary returns the test DDEV binary or aborts the current test process.

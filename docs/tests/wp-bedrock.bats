@@ -33,10 +33,17 @@ teardown() {
   assert_line --regexp "link:.*${PROJNAME}\.ddev\.site.*rel=\"https://api\.w\.org/\""
   assert_output --partial "HTTP/2 200"
   assert_success
-  # validate running project /wp-admin/
-  # Some environments return 302 redirect to /wp/wp-admin/, others return 200
-  run curl -sfI https://${PROJNAME}.ddev.site/wp-admin/
-  assert_line --regexp "link:.*${PROJNAME}\.ddev\.site.*rel=\"https://api\.w\.org/\""
-  assert_line --regexp 'HTTP/2 (200|302)'
+  # validate login page loads
+  run curl -sfI https://${PROJNAME}.ddev.site/wp/wp-login.php
+  assert_output --partial "HTTP/2 200"
   assert_success
+  # validate actual login: POST credentials, follow redirect to wp-admin, check for Dashboard
+  COOKIE_JAR=$(mktemp)
+  curl -sf -c "${COOKIE_JAR}" https://${PROJNAME}.ddev.site/wp/wp-login.php > /dev/null
+  run curl -sf -c "${COOKIE_JAR}" -b "${COOKIE_JAR}" \
+    --data "log=admin&pwd=admin&wp-submit=Log+In&redirect_to=%2Fwp%2Fwp-admin%2F&testcookie=1" \
+    --location https://${PROJNAME}.ddev.site/wp/wp-login.php
+  assert_output --partial "Dashboard"
+  assert_success
+  rm -f "${COOKIE_JAR}"
 }

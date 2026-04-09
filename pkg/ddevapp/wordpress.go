@@ -218,8 +218,12 @@ func setWordpressSiteSettingsPaths(app *DdevApp) {
 	app.SiteDdevSettingsFile = filepath.Join(settingsFileBasePath, config.SiteSettingsDdev)
 }
 
-// isWordpressApp returns true if the app of of type wordpress
+// isWordpressApp returns true if the app is of type wordpress.
+// Bedrock is a WordPress variant with its own project type, so it is excluded here.
 func isWordpressApp(app *DdevApp) bool {
+	if isWPBedrockApp(app) {
+		return false
+	}
 	_, err := wordpressGetRelativeAbsPath(app)
 	if err != nil {
 		// Multiple abspath candidates is an issue, but is still a valid

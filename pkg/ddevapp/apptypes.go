@@ -91,14 +91,6 @@ func init() {
 			composerCreateAllowedPaths: getBackdropComposerCreateAllowedPaths,
 		},
 
-		nodeps.AppTypeWPBedrock: {
-			appTypeDetect:        isWPBedrockApp,
-			settingsCreator:      createWPBedrockSettingsFile,
-			configOverrideAction: wpBedrockConfigOverrideAction,
-			uploadDirs:           getWPBedrockUploadDirs,
-			importFilesAction:    wordpressImportFilesAction,
-		},
-
 		nodeps.AppTypeCakePHP: {
 			appTypeDetect:        isCakephpApp,
 			configOverrideAction: cakephpConfigOverrideAction,
@@ -275,6 +267,14 @@ func init() {
 			hookDefaultComments:  getWordpressHooks,
 			appTypeSettingsPaths: setWordpressSiteSettingsPaths,
 			appTypeDetect:        isWordpressApp,
+			importFilesAction:    wordpressImportFilesAction,
+		},
+
+		nodeps.AppTypeWPBedrock: {
+			appTypeDetect:        isWPBedrockApp,
+			settingsCreator:      createWPBedrockSettingsFile,
+			configOverrideAction: wpBedrockConfigOverrideAction,
+			uploadDirs:           getWPBedrockUploadDirs,
 			importFilesAction:    wordpressImportFilesAction,
 		},
 	}

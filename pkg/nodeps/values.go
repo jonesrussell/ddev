@@ -89,7 +89,6 @@ const AppTypeDrupalLatestStable = AppTypeDrupal11
 const (
 	AppTypeNone        = ""
 	AppTypeBackdrop    = "backdrop"
-	AppTypeWPBedrock   = "wp-bedrock"
 	AppTypeCakePHP     = "cakephp"
 	AppTypeCodeIgniter = "codeigniter"
 	AppTypeCraftCms    = "craftcms"
@@ -112,6 +111,7 @@ const (
 	AppTypeShopware6    = "shopware6"
 	AppTypeTYPO3        = "typo3"
 	AppTypeWordPress    = "wordpress"
+	AppTypeWPBedrock    = "wp-bedrock"
 )
 
 // Ports and other defaults

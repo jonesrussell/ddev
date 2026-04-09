@@ -25,17 +25,18 @@ teardown() {
   assert_success
   run ddev wp core install --url='https://${PROJNAME}.ddev.site' --title='My Bedrock Site' --admin_user=admin --admin_password=admin --admin_email=admin@example.com
   assert_success
-  DDEV_DEBUG=true run ddev launch
-  assert_output "FULLURL https://${PROJNAME}.ddev.site"
+  DDEV_DEBUG=true run ddev launch /wp/wp-admin/
+  assert_output "FULLURL https://${PROJNAME}.ddev.site/wp/wp-admin/"
   assert_success
   # validate running project
   run curl -sfI https://${PROJNAME}.ddev.site
   assert_line --regexp "link:.*${PROJNAME}\.ddev\.site.*rel=\"https://api\.w\.org/\""
   assert_output --partial "HTTP/2 200"
   assert_success
-  # validate login page loads
-  run curl -sfI https://${PROJNAME}.ddev.site/wp/wp-login.php
-  assert_output --partial "HTTP/2 200"
+  # validate /wp/wp-admin/ redirects to login when unauthenticated
+  run curl -sfI https://${PROJNAME}.ddev.site/wp/wp-admin/
+  assert_output --partial "location: https://${PROJNAME}.ddev.site/wp/wp-login.php"
+  assert_output --partial "HTTP/2 302"
   assert_success
   # validate actual login: POST credentials, follow redirect to wp-admin, check for Dashboard
   COOKIE_JAR=$(mktemp)

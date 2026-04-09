@@ -273,6 +273,8 @@ func init() {
 		nodeps.AppTypeWPBedrock: {
 			appTypeDetect:        isWPBedrockApp,
 			settingsCreator:      createWPBedrockSettingsFile,
+			appTypeSettingsPaths: setWPBedrockSiteSettingsPaths,
+			hookDefaultComments:  getWordpressHooks,
 			configOverrideAction: wpBedrockConfigOverrideAction,
 			uploadDirs:           getWPBedrockUploadDirs,
 			importFilesAction:    wordpressImportFilesAction,
@@ -400,7 +402,7 @@ func (app *DdevApp) GetComposerCreateAllowedPaths() ([]string, error) {
 		// We don't create gitignore if it would be in top-level directory, where
 		// there is almost certainly already a gitignore (like Backdrop)
 		if path.Dir(app.SiteSettingsPath) != app.AppRoot {
-			allowed = append(allowed, nodeps.PathWithSlashesToArray(app.GetRelativeDirectory(filepath.Join(filepath.Dir(app.SiteSettingsPath), ".env", ".gitignore")))...)
+			allowed = append(allowed, nodeps.PathWithSlashesToArray(app.GetRelativeDirectory(filepath.Join(filepath.Dir(app.SiteSettingsPath), ".gitignore")))...)
 		}
 	}
 

@@ -59,6 +59,12 @@ func wpBedrockConfigOverrideAction(app *DdevApp) error {
 	return nil
 }
 
+// setWPBedrockSiteSettingsPaths sets the settings file path for Bedrock.
+// The .env file in the project root is Bedrock's DDEV-managed settings file.
+func setWPBedrockSiteSettingsPaths(app *DdevApp) {
+	app.SiteDdevSettingsFile = filepath.Join(app.AppRoot, app.ComposerRoot, ".env")
+}
+
 // getWPBedrockUploadDirs returns the upload directories for Bedrock.
 // Bedrock moves wp-content to app/ inside the docroot.
 func getWPBedrockUploadDirs(_ *DdevApp) []string {

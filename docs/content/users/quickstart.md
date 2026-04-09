@@ -3088,7 +3088,7 @@ There are several easy ways to use DDEV with WordPress:
 
     ```bash
     ddev wp core install --url='$DDEV_PRIMARY_URL' --title='My Bedrock Site' --admin_user=admin --admin_password=admin --admin_email=admin@example.com
-    ddev launch
+    ddev launch /wp/wp-login.php
     ```
 
     For more details, see [Bedrock installation](https://docs.roots.io/bedrock/master/installation/).
@@ -3105,7 +3105,7 @@ There are several easy ways to use DDEV with WordPress:
         ddev start -y
         ddev composer create-project roots/bedrock
         ddev wp core install --url='$DDEV_PRIMARY_URL' --title='My Bedrock Site' --admin_user=admin --admin_password=admin --admin_email=admin@example.com
-        ddev launch
+        ddev launch /wp/wp-login.php
         EOF
         chmod +x setup-wp-bedrock.sh
         ./setup-wp-bedrock.sh

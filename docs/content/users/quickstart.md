@@ -3093,6 +3093,24 @@ There are several easy ways to use DDEV with WordPress:
 
     For more details, see [Bedrock installation](https://docs.roots.io/bedrock/master/installation/).
 
+    ??? tip "Prefer to run as a script?"
+        To run the whole setup as a script, examine and run this script:
+
+        ```bash
+        cat > setup-wp-bedrock.sh << 'EOF'
+        #!/usr/bin/env bash
+        set -euo pipefail
+        mkdir -p my-wp-bedrock-site && cd my-wp-bedrock-site
+        ddev config --project-type=wp-bedrock
+        ddev start -y
+        ddev composer create-project roots/bedrock
+        ddev wp core install --url='$DDEV_PRIMARY_URL' --title='My Bedrock Site' --admin_user=admin --admin_password=admin --admin_email=admin@example.com
+        ddev launch
+        EOF
+        chmod +x setup-wp-bedrock.sh
+        ./setup-wp-bedrock.sh
+        ```
+
 === "Git Clone"
 
     To get started using DDEV with an existing WordPress project, clone the project’s repository.

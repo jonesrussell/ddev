@@ -1410,6 +1410,7 @@ func getCMSDefaultUploadDirsSuggestion(projectType string) string {
 		"drupal12":     "sites/default/files",
 		"backdrop":     "files",
 		"wordpress":    "wp-content/uploads",
+		"wp-bedrock":   "app/uploads",
 		"typo3":        "fileadmin",
 		"magento":      "media",
 		"magento2":     "media",

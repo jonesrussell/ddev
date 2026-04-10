@@ -33,7 +33,7 @@ You can hand-edit the YAML files DDEV creates for you after running [`ddev confi
 
 ### Environmental Overrides
 
-You can override the per-project `config.yaml` with files named `config.*.yaml`, and files like this are often created by [DDEV add-ons](../extend/additional-services.md). For example, `config.elasticsearch.yaml` in [Elasticsearch add-on](https://github.com/ddev/ddev-elasticsearch) adds additional configuration related to Elasticsearch.
+You can override the per-project `config.yaml` with files named `config.*.yaml`, and files like this are often created by [DDEV add-ons](../extend/additional-services.md). For example, `config.python2.yaml` in [Python 2 add-on](https://github.com/ddev/ddev-python2) adds additional configuration related to Python 2.
 
 Many teams use `config.local.yaml` for configuration that is specific to one environment, and not checked into the team’s default `config.yaml`. For example, you might enable `performance_mode: mutagen` only on your machine. Or you could use a different database type. The file `config.local.yaml` is gitignored by default.
 
@@ -621,7 +621,7 @@ The DDEV-specific project type.
 
 | Type | Default | Usage
 | -- | -- | --
-| :octicons-file-directory-16: project | `php` | Can be `backdrop`, `cakephp`, `codeigniter`, `craftcms`, `drupal`, `drupal6`, `drupal7`, `drupal8`, `drupal9`, `drupal10`, `drupal11`, `drupal12`, `generic`, `laravel`, `magento`, `magento2`, `php`, `shopware6`, `silverstripe`, `symfony`, `typo3`, or `wordpress`.
+| :octicons-file-directory-16: project | `php` | Can be `backdrop`, `cakephp`, `codeigniter`, `craftcms`, `drupal`, `drupal6`, `drupal7`, `drupal8`, `drupal9`, `drupal10`, `drupal11`, `drupal12`, `generic`, `laravel`, `magento`, `magento2`, `php`, `shopware6`, `silverstripe`, `symfony`, `typo3`, `wordpress`, or `wp-bedrock`.
 
 The `php` type doesn’t attempt [CMS configuration](../../users/quickstart.md) or settings file management and can work with any project.
 

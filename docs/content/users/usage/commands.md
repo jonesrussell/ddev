@@ -1854,7 +1854,7 @@ ddev version
 
 ## `wp`
 
-Run the [WP-CLI `wp` command](https://wp-cli.org/); available only in projects of type `wordpress`.
+Run the [WP-CLI `wp` command](https://wp-cli.org/); available only in projects of type `wordpress` and `wp-bedrock`.
 
 ```shell
 # Install WordPress site using `wp core install`

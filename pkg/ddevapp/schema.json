@@ -638,7 +638,8 @@
         "silverstripe",
         "symfony",
         "typo3",
-        "wordpress"
+        "wordpress",
+        "wp-bedrock"
       ]
     },
     "upload_dirs": {

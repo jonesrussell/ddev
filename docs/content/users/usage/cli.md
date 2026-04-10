@@ -71,7 +71,7 @@ The dashboard automatically detects your terminal's color capabilities and adapt
 * [`ddev sake`](../usage/commands.md#sake) (Silverstripe CMS only) gives direct access to the `sake` CLI.
 * [`ddev spark`](../usage/commands.md#spark) (CodeIgniter) gives direct access to the `spark` CLI.
 * [`ddev typo3`](../usage/commands.md#typo3) (TYPO3 only) gives direct access to the `typo3` CLI.
-* [`ddev wp`](../usage/commands.md#wp) (WordPress only) gives direct access to the `wp` CLI.
+* [`ddev wp`](../usage/commands.md#wp) (WordPress and Bedrock only) gives direct access to the `wp` CLI.
 
 ## Node.js Tools
 
@@ -100,13 +100,16 @@ ddev export-db >/tmp/db.sql.gz
 
 To import static file assets for a project, such as uploaded images and documents, use the command [`ddev import-files`](../usage/commands.md#import-files). This command will prompt you to specify the location of your import asset, then import the assets into the project’s upload directory. To define a custom upload directory, set the [`upload_dirs`](../configuration/config.md#upload_dirs) config option. If no custom upload directory is defined, the default will be used:
 
-* For Backdrop projects, this is `files`.
-* For Drupal projects, this is `sites/default/files`.
+* For Backdrop projects, this is the `files` directory.
+* For Craft CMS projects, this is the `files` directory.
+* For Drupal projects, this is the `sites/default/files` directory.
 * For Magento 1 projects, this is the `media` directory.
-* For Magento 2 projects, this is the `pub/media` directory.
+* For Magento 2 projects, this is the `media` directory.
 * For Shopware projects, this is the `media` directory.
+* For Silverstripe CMS projects, this is the `assets` directory.
 * For TYPO3 projects, this is the `fileadmin` directory.
 * For WordPress projects, this is the `wp-content/uploads` directory.
+* For WordPress Bedrock projects, this is the `app/uploads` directory.
 
 Other project types need a custom configuration to be able to use this command.
 

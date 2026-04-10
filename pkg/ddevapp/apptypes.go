@@ -272,8 +272,7 @@ func init() {
 
 		nodeps.AppTypeWPBedrock: {
 			appTypeDetect:        isWPBedrockApp,
-			settingsCreator:      createWPBedrockSettingsFile,
-			appTypeSettingsPaths: setWPBedrockSiteSettingsPaths,
+			postStartAction:      wpBedrockPostStartAction,
 			hookDefaultComments:  getWordpressHooks,
 			configOverrideAction: wpBedrockConfigOverrideAction,
 			uploadDirs:           getWPBedrockUploadDirs,

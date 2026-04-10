@@ -1,6 +1,7 @@
 package ddevapp
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -14,6 +15,54 @@ import (
 // configuration file and is not present in standard WordPress.
 func isWPBedrockApp(app *DdevApp) bool {
 	return fileutil.FileExists(filepath.Join(app.AppRoot, app.ComposerRoot, "config", "application.php"))
+}
+
+// wpBedrockPostStartAction checks to see if the .env file is set up
+func wpBedrockPostStartAction(app *DdevApp) error {
+	// We won't touch env if disable_settings_management: true
+	if app.DisableSettingsManagement {
+		return nil
+	}
+	envFilePath := filepath.Join(app.AppRoot, app.ComposerRoot, ".env")
+	_, envText, err := ReadProjectEnvFile(envFilePath)
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("unable to read .env file: %v", err)
+	}
+	if os.IsNotExist(err) {
+		err = fileutil.CopyFile(filepath.Join(app.AppRoot, app.ComposerRoot, ".env.example"), filepath.Join(app.AppRoot, app.ComposerRoot, ".env"))
+		if err != nil {
+			util.Debug("Bedrock: .env.example does not exist yet, not trying to process it")
+			return nil
+		}
+		_, envText, err = ReadProjectEnvFile(envFilePath)
+		if err != nil {
+			return err
+		}
+	}
+	envMap := map[string]string{
+		"WP_ENV":           "development",
+		"WP_HOME":          app.GetPrimaryURL(),
+		"WP_SITEURL":       app.GetPrimaryURL() + "/wp",
+		"DB_NAME":          "db",
+		"DB_USER":          "db",
+		"DB_PASSWORD":      "db",
+		"DB_HOST":          "db",
+		"AUTH_KEY":         util.RandString(64),
+		"SECURE_AUTH_KEY":  util.RandString(64),
+		"LOGGED_IN_KEY":    util.RandString(64),
+		"NONCE_KEY":        util.RandString(64),
+		"AUTH_SALT":        util.RandString(64),
+		"SECURE_AUTH_SALT": util.RandString(64),
+		"LOGGED_IN_SALT":   util.RandString(64),
+		"NONCE_SALT":       util.RandString(64),
+	}
+
+	err = WriteProjectEnvFile(envFilePath, envMap, envText)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // createWPBedrockSettingsFile writes the DDEV-managed .env file for Bedrock

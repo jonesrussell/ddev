@@ -32,8 +32,13 @@ func PopulateGlobalCustomCommandFiles() error {
 	if err != nil {
 		util.Warning("unable to hash global commands directory: %v", err)
 	}
+	// Include the volume's creation timestamp in the cache key so that deleting
+	// and recreating the volume (e.g. between CI runs) always triggers a fresh copy,
+	// even when the source directory hash is unchanged.
+	volCreatedAt := dockerutil.VolumeCreatedAt("ddev-global-cache")
+	cacheKey := currentHash + "|" + volCreatedAt
 	hashFilePath := filepath.Join(globalconfig.GetGlobalDdevDir(), globalCommandsHashFile)
-	if savedHash, err := os.ReadFile(hashFilePath); err == nil && string(savedHash) == currentHash && dockerutil.VolumeExists("ddev-global-cache") {
+	if savedKey, err := os.ReadFile(hashFilePath); err == nil && string(savedKey) == cacheKey && volCreatedAt != "" {
 		util.Debug("PopulateGlobalCustomCommandFiles: skipping, global commands unchanged")
 		return nil
 	}
@@ -54,8 +59,8 @@ func PopulateGlobalCustomCommandFiles() error {
 		return fmt.Errorf("unable to chmod %s: %v (stderr=%s)", commandDirInVolume, err, stderr)
 	}
 
-	// Save the fingerprint so we can skip next time if unchanged
-	_ = os.WriteFile(hashFilePath, []byte(currentHash), 0644)
+	// Save the cache key so we can skip next time if unchanged
+	_ = os.WriteFile(hashFilePath, []byte(cacheKey), 0644)
 
 	return nil
 }

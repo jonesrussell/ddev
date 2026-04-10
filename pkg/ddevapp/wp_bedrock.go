@@ -28,6 +28,7 @@ func wpBedrockPostStartAction(app *DdevApp) error {
 	if err != nil && !os.IsNotExist(err) {
 		return fmt.Errorf("unable to read .env file: %v", err)
 	}
+	setSaltAndKeys := false
 	if os.IsNotExist(err) {
 		err = fileutil.CopyFile(filepath.Join(app.AppRoot, app.ComposerRoot, ".env.example"), filepath.Join(app.AppRoot, app.ComposerRoot, ".env"))
 		if err != nil {
@@ -38,23 +39,27 @@ func wpBedrockPostStartAction(app *DdevApp) error {
 		if err != nil {
 			return err
 		}
+		setSaltAndKeys = true
 	}
 	envMap := map[string]string{
-		"WP_ENV":           "development",
-		"WP_HOME":          app.GetPrimaryURL(),
-		"WP_SITEURL":       app.GetPrimaryURL() + "/wp",
-		"DB_NAME":          "db",
-		"DB_USER":          "db",
-		"DB_PASSWORD":      "db",
-		"DB_HOST":          "db",
-		"AUTH_KEY":         util.RandString(64),
-		"SECURE_AUTH_KEY":  util.RandString(64),
-		"LOGGED_IN_KEY":    util.RandString(64),
-		"NONCE_KEY":        util.RandString(64),
-		"AUTH_SALT":        util.RandString(64),
-		"SECURE_AUTH_SALT": util.RandString(64),
-		"LOGGED_IN_SALT":   util.RandString(64),
-		"NONCE_SALT":       util.RandString(64),
+		"WP_ENV":      "development",
+		"WP_HOME":     app.GetPrimaryURL(),
+		"WP_SITEURL":  app.GetPrimaryURL() + "/wp",
+		"DB_NAME":     "db",
+		"DB_USER":     "db",
+		"DB_PASSWORD": "db",
+		"DB_HOST":     "db",
+	}
+
+	if setSaltAndKeys {
+		envMap["AUTH_KEY"] = util.RandString(64)
+		envMap["SECURE_AUTH_KEY"] = util.RandString(64)
+		envMap["LOGGED_IN_KEY"] = util.RandString(64)
+		envMap["NONCE_KEY"] = util.RandString(64)
+		envMap["AUTH_SALT"] = util.RandString(64)
+		envMap["SECURE_AUTH_SALT"] = util.RandString(64)
+		envMap["LOGGED_IN_SALT"] = util.RandString(64)
+		envMap["NONCE_SALT"] = util.RandString(64)
 	}
 
 	err = WriteProjectEnvFile(envFilePath, envMap, envText)

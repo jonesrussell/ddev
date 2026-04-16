@@ -1494,7 +1494,7 @@ func (app *DdevApp) buildContextFingerprint() string {
 		app.GetConfigPath(".webimageBuild"),
 		app.GetConfigPath(".dbimageBuild"),
 	}
-	hash, err := fileutil.HashDirs(dirs, ddevImages.GetWebImage(), app.GetDBImage())
+	hash, err := fileutil.HashDirs(dirs, app.WebImage, app.GetDBImage())
 	if err != nil {
 		util.Warning("unable to hash build context directories: %v", err)
 		return ""
@@ -1844,7 +1844,7 @@ Fix with 'ddev config global --required-docker-compose-version="" --use-docker-c
 
 	if !buildNeeded {
 		// Verify the built images still exist locally
-		webBuilt := ddevImages.GetWebImage() + "-" + app.Name + "-built"
+		webBuilt := app.WebImage + "-" + app.Name + "-built"
 		dbBuilt := app.GetDBImage() + "-" + app.Name + "-built"
 		webExists, _ := dockerutil.ImageExistsLocally(webBuilt)
 		dbExists := true
@@ -1889,7 +1889,7 @@ Fix with 'ddev config global --required-docker-compose-version="" --use-docker-c
 		var postBuildWg sync.WaitGroup
 
 		postBuildWg.Go(func() {
-			_, logStderrOutput, logStderrErr = dockerutil.RunSimpleContainer(app.WebImage+"-"+app.Name+"-built", "log-stderr-"+app.Name+"-"+util.RandString(6), []string{"sh", "-c", "log-stderr.sh --show 2>/dev/null || true"}, []string{}, []string{}, nil, uid, true, false, map[string]string{"com.ddev.site-name": ""}, nil, nil)
+			_, logStderrOutput, logStderrErr = dockerutil.RunSimpleContainer(app.WebImage+"-"+app.Name+"-built", "log-stderr-"+app.Name+"-"+util.RandString(6), []string{"sh", "-c", "log-stderr.sh --show 2>/dev/null || true"}, []string{}, []string{}, nil, uid, true, false, nil, nil, nil)
 		})
 
 		postBuildWg.Go(func() {
